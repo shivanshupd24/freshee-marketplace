@@ -1,0 +1,95 @@
+.market-home { color: #253329; }
+.market-section { margin-bottom: 34px; }
+.market-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 17px; }
+.market-section-heading h2 { font-size: clamp(19px, 2.7vw, 27px); letter-spacing: -.7px; line-height: 1.2; }
+.market-section-heading > button { color: #527d35; font-size: 12px; font-weight: 750; white-space: nowrap; padding: 8px 0 8px 8px; }
+.market-section-heading > span { font-size: 11px; color: #687369; flex-shrink: 0; }
+.market-section-description { font-size: 12px; color: #758075; margin: -8px 0 18px; }
+.market-demo { padding: 5px 8px; border-radius: 6px; background: #f0f4ea; }
+.market-shortcuts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.market-shortcuts button { padding: 0; font-size: 14px; font-weight: 650; }
+.market-shortcuts img { width: 100%; aspect-ratio: 1.2; object-fit: cover; border-radius: 20px; margin-bottom: 10px; }
+.market-store-track, .market-product-track, .market-highlights { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding: 4px 3px 10px; }
+.market-store-track::-webkit-scrollbar, .market-product-track::-webkit-scrollbar, .market-banner-track::-webkit-scrollbar { display: none; }
+.market-store { flex: 1 0 28%; min-width: 220px; padding: 0 0 12px; text-align: left; border: 1px solid #e9ece5; border-radius: 18px; overflow: hidden; scroll-snap-align: start; background: #fff; }
+.market-store.selected { border-color: #6b994a; box-shadow: 0 0 0 2px #6b994a33; }
+.market-store-photo { position: relative; }
+.market-store-photo img { width: 100%; height: 145px; object-fit: cover; }
+.market-store-photo > span { position: absolute; bottom: 9px; left: 10px; background: #ffffffed; border-radius: 6px; padding: 5px 8px; font-size: 10px; font-weight: 750; }
+.market-store h3 { font-size: 16px; margin: 12px 12px 4px; }
+.market-store p { font-size: 11px; color: #758075; margin: 0 12px; }
+.store-explore { display: flex; justify-content: space-between; margin: 12px 12px 0; font-size: 11px; font-weight: 700; color: #527d35; }
+.market-store-preview { padding: 14px; background: #f7f9f3; border-radius: 16px; margin-top: 12px; }
+.store-close { color: #701048; font-size: 12px; padding: 8px 0 18px; }
+.market-store-preview .market-section { margin-bottom: 0; }
+.market-carousel { margin-bottom: 30px; }
+.market-banner-track { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; border-radius: 24px; }
+.market-banner { position: relative; flex: 0 0 100%; min-width: 0; min-height: 310px; overflow: hidden; border-radius: 24px; scroll-snap-align: start; background: #fce9b7; isolation: isolate; }
+.market-banner > img { position: absolute; right: 0; top: 0; width: 60%; height: 100%; object-fit: cover; z-index: -2; }
+.market-banner::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #fce9b7 5%, #fce9b7 36%, #fce9b700 72%); z-index: -1; }
+.market-banner.peach { background: #f5e8dc; }
+.market-banner.peach::before { background: linear-gradient(90deg, #f5e8dc 5%, #f5e8dc 36%, #f5e8dc00 72%); }
+.market-banner.mint { background: #e5f1dc; }
+.market-banner.mint::before { background: linear-gradient(90deg, #e5f1dc 5%, #e5f1dc 36%, #e5f1dc00 72%); }
+.market-banner-copy { padding: 35px; width: 62%; }
+.market-banner-copy > span { font-size: 10px; font-weight: 700; letter-spacing: 2px; }
+.market-banner h2 { font-size: clamp(24px, 4vw, 42px); line-height: 1.08; letter-spacing: -1.2px; white-space: pre-line; margin: 14px 0; }
+.market-banner p { font-size: 13px; max-width: 230px; line-height: 1.5; }
+.market-banner-copy > button { background: #253329; color: white; border-radius: 30px; font-size: 12px; font-weight: 750; padding: 12px 22px; margin-top: 22px; }
+.market-banner-copy > button span { margin-left: 16px; }
+.market-carousel-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 10px; }
+.market-carousel-controls > button { width: 32px; height: 32px; border: 1px solid #e9ece5; border-radius: 50%; }
+.market-carousel-controls > button:disabled { opacity: .3; cursor: default; }
+.market-carousel-controls > div { display: flex; }
+.market-carousel-controls > div button { width: 26px; height: 30px; position: relative; padding: 0; }
+.market-carousel-controls > div button::after { content: ''; position: absolute; inset: 11px 9px; border-radius: 8px; background: #e5e9e1; }
+.market-carousel-controls > div button.active::after { inset-inline: 2px; background: #497d25; }
+.product-shelf { padding: 22px 0 8px; }
+.green-shelf, .peach-shelf { background: linear-gradient(120deg, #ecf8df, #d4efbc); padding: 24px 20px 16px; border-radius: 24px; }
+.peach-shelf { background: linear-gradient(120deg, #fcf2e8, #f4dfd0); }
+.market-product { flex: 1 0 20%; min-width: 145px; scroll-snap-align: start; }
+.market-product-art { position: relative; background: #ffffffc7; border-radius: 14px; aspect-ratio: 1; display: grid; place-items: center; margin-bottom: 16px; }
+.product-shelf:not(.green-shelf):not(.peach-shelf) .market-product-art { background: #f5f5f0; }
+.market-product-art > span { font-size: 64px; filter: drop-shadow(0 8px 5px #00000012); }
+.market-save { position: absolute; top: 5px; right: 5px; color: #abb5a6; width: 34px; height: 34px; font-size: 25px; text-shadow: 0 1px white; }
+.market-save.is-saved { color: #98135f; }
+.market-add { position: absolute; right: 0; bottom: -6px; background: #fff; border: 1px solid #6b9973; color: #2d7551; width: 36px; height: 36px; border-radius: 8px; font-size: 26px; }
+.market-price { font-size: 17px; }
+.market-product > p { font-size: 10px; color: #7b8476; text-transform: uppercase; margin: 8px 0 4px; letter-spacing: .4px; }
+.market-product h3 { font-size: 14px; line-height: 1.4; margin-bottom: 8px; }
+.market-product > small { color: #46724c; font-size: 12px; }
+.market-highlights > button { flex: 1 0 28%; min-width: 155px; overflow: hidden; border-radius: 18px; background: #f6f5f1; padding: 0; text-align: left; scroll-snap-align: start; }
+.market-highlights img { width: 100%; height: 160px; object-fit: cover; }
+.market-highlights button > span { display: flex; justify-content: space-between; gap: 8px; padding: 14px; font-size: 14px; font-weight: 700; }
+.market-tech-banner { display: flex; align-items: center; width: 100%; padding: 0; overflow: hidden; background: #fbe6ae; border-radius: 20px; text-align: left; margin-bottom: 16px; }
+.market-tech-banner > span { flex: 1; padding: 25px; }
+.market-tech-banner small { font-size: 9px; letter-spacing: 1.2px; }
+.market-tech-banner strong { display: block; font-size: 26px; line-height: 1.15; margin: 10px 0; letter-spacing: -.6px; }
+.market-tech-banner span > span { font-size: 12px; }
+.market-tech-banner img { width: 40%; height: 200px; object-fit: cover; }
+@media (max-width: 700px) {
+  .market-section { margin-bottom: 25px; }
+  .market-section-heading { gap: 8px; margin-bottom: 14px; }
+  .market-section-heading h2 { font-size: 19px; letter-spacing: -.5px; }
+  .market-section-heading > button { font-size: 11px; }
+  .market-shortcuts { gap: 10px; }
+  .market-shortcuts img { border-radius: 14px; aspect-ratio: 1; }
+  .market-shortcuts button { font-size: 11px; }
+  .market-store { min-width: 200px; }
+  .market-store-photo img { height: 120px; }
+  .market-banner { min-height: 245px; border-radius: 20px; }
+  .market-banner-copy { padding: 23px 17px; width: 69%; }
+  .market-banner-copy > span { font-size: 8px; letter-spacing: 1px; }
+  .market-banner h2 { font-size: 27px; }
+  .market-banner p { font-size: 11px; max-width: 155px; }
+  .market-banner-copy > button { padding: 10px 17px; margin-top: 17px; }
+  .market-product { flex: 0 0 135px; min-width: 0; }
+  .market-product-art > span { font-size: 54px; }
+  .green-shelf, .peach-shelf { padding: 20px 14px 14px; }
+  .market-highlights img { height: 120px; }
+  .market-highlights button > span { font-size: 12px; }
+  .market-tech-banner > span { padding: 18px 14px; }
+  .market-tech-banner strong { font-size: 21px; }
+  .market-tech-banner small { font-size: 7px; letter-spacing: .6px; }
+  .market-tech-banner img { height: 160px; width: 35%; }
+}
