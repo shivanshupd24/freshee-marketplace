@@ -17,9 +17,8 @@ const stores = [
   { name: 'Home & More', image: 'home', type: 'Home care & living', ids: [106, 111, 112, 113], distance: '1.6 km' },
 ]
 
-export default function MarketplaceHome({ products, addItem, openProduct, saved, toggleSaved, openCategory, viewAll, address }) {
+export default function MarketplaceHome({ products, addItem, openProduct, saved, toggleSaved, openCategory, viewAll, address, openShop }) {
   const [slide, setSlide] = useState(0)
-  const [store, setStore] = useState(null)
   const carousel = useRef(null)
   function goToSlide(index) {
     const track = carousel.current
@@ -31,9 +30,9 @@ export default function MarketplaceHome({ products, addItem, openProduct, saved,
       <div className="market-product-track">
         {items.map((item) => <article className="market-product" key={item.id}>
           <div className="market-product-art">
-            <button className="market-product-open" aria-label={`Compare sellers for ${item.dish}`} onClick={() => openProduct(item)}><span aria-hidden="true">{item.emoji}</span></button>
+            <button className="market-product-open" aria-label={`Find shops selling ${item.dish}`} onClick={() => openProduct(item)}><span aria-hidden="true">{item.emoji}</span></button>
             <button className={`market-save ${saved.includes(item.id) ? 'is-saved' : ''}`} aria-label={`${saved.includes(item.id) ? 'Unsave' : 'Save'} ${item.dish}`} aria-pressed={saved.includes(item.id)} onClick={() => toggleSaved(item.id)}>♥</button>
-            <button className="market-add" aria-label={`Add ${item.dish} to bag`} onClick={() => addItem(item)}>+</button>
+            <button className="market-add" aria-label={`Find a shop for ${item.dish}`} onClick={() => addItem(item)}>+</button>
           </div>
           <strong className="market-price">₹{item.price}</strong>
           <p>{item.name}</p><button className="market-product-title" onClick={() => openProduct(item)}><h3>{item.dish}</h3></button><small>{item.unit}</small>
@@ -50,11 +49,10 @@ export default function MarketplaceHome({ products, addItem, openProduct, saved,
     <section className="market-section" aria-labelledby="stores-heading">
       <div className="market-section-heading"><h2 id="stores-heading">Popular stores near you</h2><span className="market-demo">Demo stores</span></div>
       <p className="market-section-description">Around {address} · Sample distances and catalogues</p>
-      <div className="market-store-track">{stores.map((item) => <button key={item.name} className={`market-store ${store?.name === item.name ? 'selected' : ''}`} aria-pressed={store?.name === item.name} onClick={() => setStore(store?.name === item.name ? null : item)}>
+      <div className="market-store-track">{stores.map((item) => <button key={item.name} className="market-store" onClick={() => openShop(item.name)}>
         <div className="market-store-photo"><img src={photo(item.image)} alt="" loading="lazy" /><span>{item.distance} away</span></div>
         <h3>{item.name}</h3><p>{item.type}</p><span className="store-explore">Explore store <span aria-hidden="true">→</span></span>
       </button>)}</div>
-      {store && <div className="market-store-preview"><button className="store-close" onClick={() => setStore(null)}>Close store preview ×</button>{productRail(`${store.name} · demo catalogue`, products.filter((item) => store.ids.includes(item.id)))}</div>}
     </section>
 
     <section className="market-carousel" aria-label="Featured collections" aria-roledescription="carousel">

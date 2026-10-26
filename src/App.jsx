@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import MarketplaceHome from './MarketplaceHome'
-import ProductComparison from './ProductComparison'
+import ShopPages from './ShopPages'
+import SearchPage from './SearchPage'
+import { makeShops } from './shops'
 
 function Icon({ name, size = 22, ...props }) {
   const paths = {
@@ -249,7 +251,11 @@ const browseCategories = categorySections.flatMap((section) => section.items)
 const matchesCategorySearch = (item, section, query) =>
   `${section.title} ${item.name} ${item.groups.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase())
 
+const shops = makeShops(essentials, restaurants)
+
 function App() {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [activeShop, setActiveShop] = useState(null)
   const [mode, setMode] = useState('Daily Essentials')
   const [department, setDepartment] = useState('All')
   const [category, setCategory] = useState('All')
@@ -304,10 +310,12 @@ function App() {
     }
   }, [modal])
 
+  const isSearchPage = nav === 'Search' && !activeShop
   const isFood = mode === 'Food'
-  const isMarketplaceHome = !isFood && nav === 'Home' && department === 'All' && category === 'All' && !query.trim()
+  const isMarketplaceHome = !activeShop && !isFood && nav === 'Home' && department === 'All' && category === 'All' && !query.trim()
   const isCategoryPage = !isFood && nav === 'Categories'
-  const isCategoryView = !isFood && ['Categories', 'Category results'].includes(nav)
+  const isShopPage = !!activeShop || (!isFood && nav === 'Category results')
+  const isCategoryView = !!activeShop || (!isFood && ['Categories', 'Category results'].includes(nav))
   const selectedBrowseCategory = browseCategories.find((item) => item.name === category)
   const activeDepartment = essentialDepartments.find((item) => item.name === department)
   const departmentItems = essentials.filter((item) => department === 'All' || activeDepartment.groups.includes(item.group))
@@ -320,6 +328,7 @@ function App() {
     (nav !== 'Saved' || saved.includes(item.id)),
   )
   function switchMode(next) {
+    setActiveShop(null)
     setMode(next)
     setDepartment('All')
     setQuery('')
@@ -345,7 +354,40 @@ function App() {
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
   const deliveryTotal = [...new Map(cart.filter((item) => item.sellerId).map((item) => [item.sellerId, item.deliveryFee])).values()].reduce((sum, fee) => sum + fee, 0)
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  function openSearch() {
+    setSearchQuery(query)
+    setQuery('')
+    setNav('Search')
+    window.scrollTo({ top: 0 })
+  }
+  function openCategory(name) {
+    setActiveShop(null)
+    setCategory(name)
+    setDepartment('All')
+    setQuery('')
+    setNav('Category results')
+    setModal(null)
+    window.scrollTo({ top: 0 })
+  }
+  function openShop(shop) {
+    setActiveShop(shop)
+    setQuery('')
+    setModal(null)
+    window.scrollTo({ top: 0 })
+  }
+  function browseProduct(item) {
+    openCategory(browseCategories.find(c => c.groups.includes(item.group))?.name || item.group)
+  }
   function addItem(item) {
+    if (!item.sellerId) {
+      const shop = shops.find(s => s.products.some(p => p.id === item.id))
+      if (!shop) return
+      item = { ...item, id: `${shop.id}:${item.id}`, sellerId: shop.id, sellerName: shop.name, deliveryFee: shop.deliveryFee }
+    }
+    if (cart.length && cart[0].sellerId !== item.sellerId) {
+      setModal({ switchShop: item })
+      return
+    }
     setCart((items) =>
       items.some((i) => i.id === item.id)
         ? items.map((i) =>
@@ -368,6 +410,7 @@ function App() {
       setModal('cart')
       return
     }
+    setActiveShop(null)
     setNav(item)
     setDepartment('All')
     setCategory(item === 'Offers' ? 'Offers' : 'All')
@@ -387,7 +430,7 @@ function App() {
 
   return (
     <div className={`app-shell ${isFood ? 'food-mode' : 'essentials-mode'} ${isCategoryView ? 'category-view' : ''}`}>
-      <section className="festival-zone">
+      {!isSearchPage && !isShopPage && !isCategoryPage && <section className="festival-zone">
         <div className="service-tabs" role="tablist" aria-label="Service">
           {['Daily Essentials', 'Food'].map((item) => (
             <button
@@ -453,11 +496,12 @@ function App() {
         <div id="service-panel" role="tabpanel" aria-labelledby={`service-${isFood ? 'food' : 'essentials'}`} className="service-panel">
         <div className="search-row">
           <div className="search-box">
-            <Icon name="search" size={23} />
+            <button aria-label="Search products" onClick={openSearch}><Icon name="search" size={23} /></button>
             <input
-              aria-label={isCategoryView ? 'Search marketplace categories' : isFood ? 'Search food or restaurants' : 'Search daily essentials'}
+              onFocus={openSearch}
+              aria-label={activeShop ? 'Search this shop’s items' : nav === 'Category results' ? 'Search shops in this category' : isCategoryView ? 'Search marketplace categories' : isFood ? 'Search food or restaurants' : 'Search daily essentials'}
               placeholder={
-                isCategoryView ? 'Search fashion, electronics, beauty…' : mode === 'Food'
+                activeShop ? `Search in ${activeShop.name}…` : nav === 'Category results' ? 'Search shops in this category…' : isCategoryView ? 'Search fashion, electronics, beauty…' : mode === 'Food'
                   ? 'Search for “pizza”'
                   : 'Search for milk, fruits, essentials…'
               }
@@ -497,7 +541,9 @@ function App() {
               onClick={() => {
                 if (isFood) setCategory(item.name)
                 else {
-                  setDepartment(item.name)
+                  if (item.name !== 'All') { openCategory(item.name); return }
+                  setActiveShop(null)
+                  setDepartment('All')
                   setCategory('All')
                   setQuery('')
                 }
@@ -594,24 +640,27 @@ function App() {
           </p>
         </section>}
         </div>
-      </section>
+      </section>}
 
       <main>
-        {isMarketplaceHome ? <MarketplaceHome
+        {isSearchPage ? <SearchPage shops={shops} query={searchQuery} onSearch={setSearchQuery}
+          onBack={() => navigate('Home')} onOpen={openShop} onAdd={addItem}
+          cart={cart} onQuantity={changeQuantity} onBag={() => setModal('cart')} /> : isShopPage ? <ShopPages
+          key={activeShop?.id || category}
+          shops={shops.filter(s => s.groups.some(g => (selectedBrowseCategory?.groups || essentialDepartments.find(d => d.name === category)?.groups || [category]).includes(g)))}
+          shop={activeShop} title={category} query={query} onSearch={setQuery} cart={cart}
+          onOpen={openShop} onAdd={addItem} onQuantity={changeQuantity} onBag={() => setModal('cart')}
+          onBack={() => { if (activeShop) { setActiveShop(null); setQuery('') } else navigate('Categories') }}
+        /> : isMarketplaceHome ? <MarketplaceHome
           products={essentials}
-          addItem={(item) => setModal({ comparison: item })}
-          openProduct={(item) => setModal({ comparison: item })}
+          addItem={browseProduct}
+          openShop={(name) => openShop(shops.find(s => s.name === name))}
+          openProduct={browseProduct}
           saved={saved}
           address={address}
           toggleSaved={(id) => setSaved((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id])}
           viewAll={() => navigate('Categories')}
-          openCategory={(name) => {
-            setCategory(name)
-            setDepartment('All')
-            setQuery('')
-            setNav('Category results')
-            window.scrollTo({ top: 0, behavior: 'smooth' })
-          }}
+          openCategory={openCategory}
         /> : isCategoryPage ? (
           <div className="category-directory" aria-label="Shop by category">
             <div className="category-directory-heading"><h1>Explore all categories</h1><p>Everyday needs and your next favourite find.</p></div>
@@ -703,7 +752,7 @@ function App() {
                   <button
                     className="photo-link"
                     aria-label={`View ${r.name}`}
-                    onClick={() => setModal(r)}
+                    onClick={() => openShop(shops.find(s => s.id === `food-${r.id}`))}
                   >
                     <img src={`/images/${r.image}.jpg`} alt={r.dish} />
                     <span className="photo-shade" />
@@ -730,7 +779,7 @@ function App() {
                     <Icon name="heart" size={23} />
                   </button>
                 </div>
-                <button className="restaurant-info" onClick={() => setModal(r)}>
+                <button className="restaurant-info" onClick={() => openShop(shops.find(s => s.id === `food-${r.id}`))}>
                   <div className="restaurant-title">
                     <h3>{r.name}</h3>
                     <span className="rating">★ {r.rating}</span>
@@ -788,20 +837,20 @@ function App() {
             {nav === 'Category results' && <button className="back-to-categories" onClick={() => navigate('Categories')}>← All categories</button>}
             <div className="section-heading"><h2>{selectedBrowseCategory ? category : department === 'All' ? 'Shop your everyday' : `Shop ${department}`}</h2><span>{department === 'All' ? 'Fresh finds, all in one place' : 'Your everyday favourites, in one place'}</span></div>
             {nav !== 'Category results' && <div id="shopping-categories" className="essentials-categories" aria-label="Essential categories">
-              {['All', ...new Set(departmentItems.map((item) => item.group))].map((group) => <button key={group} aria-pressed={category === group} className={category === group ? 'active' : ''} onClick={() => setCategory(group)}>{group}</button>)}
+              {['All', ...new Set(departmentItems.map((item) => item.group))].map((group) => <button key={group} aria-pressed={category === group} className={category === group ? 'active' : ''} onClick={() => openCategory(group)}>{group}</button>)}
             </div>}
             <div className="section-heading"><h2>{nav === 'Saved' ? 'Your saved essentials' : selectedBrowseCategory ? 'Products' : 'Everyday favourites'}</h2><span>{visibleEssentials.length} items</span></div>
             <div className="essentials-grid">
               {visibleEssentials.map((item) => <article className="essential-card" key={item.id}>
-                <div className="essential-art"><button className="essential-product-open" aria-label={`Compare sellers for ${item.dish}`} onClick={() => setModal({ comparison: item })}><span aria-hidden="true">{item.emoji}</span></button><button className={`save-button ${saved.includes(item.id) ? 'saved' : ''}`} aria-label={`${saved.includes(item.id) ? 'Unsave' : 'Save'} ${item.dish}`} aria-pressed={saved.includes(item.id)} onClick={() => setSaved((ids) => ids.includes(item.id) ? ids.filter((id) => id !== item.id) : [...ids, item.id])}><Icon name="heart" size={20} /></button></div>
-                <p>{item.name}</p><button className="essential-product-title" onClick={() => setModal({ comparison: item })}><h3>{item.dish}</h3></button><small>{item.unit}</small>
-                <div className="essential-price"><strong>₹{item.price}</strong><button onClick={() => setModal({ comparison: item })} aria-label={`Compare sellers for ${item.dish} before adding`}>ADD +</button></div>
+                <div className="essential-art"><button className="essential-product-open" aria-label={`Find shops selling ${item.dish}`} onClick={() => browseProduct(item)}><span aria-hidden="true">{item.emoji}</span></button><button className={`save-button ${saved.includes(item.id) ? 'saved' : ''}`} aria-label={`${saved.includes(item.id) ? 'Unsave' : 'Save'} ${item.dish}`} aria-pressed={saved.includes(item.id)} onClick={() => setSaved((ids) => ids.includes(item.id) ? ids.filter((id) => id !== item.id) : [...ids, item.id])}><Icon name="heart" size={20} /></button></div>
+                <p>{item.name}</p><button className="essential-product-title" onClick={() => browseProduct(item)}><h3>{item.dish}</h3></button><small>{item.unit}</small>
+                <div className="essential-price"><strong>₹{item.price}</strong><button onClick={() => browseProduct(item)} aria-label={`Find shops selling ${item.dish} before adding`}>ADD +</button></div>
               </article>)}
             </div>
             {!visibleEssentials.length && <div className="empty-state"><h3>{nav === 'Saved' ? 'Your saved essentials belong here' : 'No products found'}</h3><p>{nav === 'Saved' ? 'Tap a heart to save an everyday favourite.' : selectedBrowseCategory ? 'No products are listed in this category yet. Explore another category.' : 'Try another search or category.'}</p></div>}
           </section>
         )}
-        {!isCategoryView && <footer className="page-footer">
+        {!isSearchPage && !isCategoryView && <footer className="page-footer">
           <span>Made for your</span>
           <strong>
             {isFood ? 'happy cravings' : 'everyday discoveries'}<span>✳</span>
@@ -810,7 +859,7 @@ function App() {
           <small>FRESHEE · JABALPUR</small>
         </footer>}
       </main>
-      <nav className="bottom-nav" aria-label="Main navigation">
+      {!isSearchPage && <nav className="bottom-nav" aria-label="Main navigation">
         {[
           { name: 'Home', icon: 'home' },
           { name: 'Categories', icon: 'grid' },
@@ -831,7 +880,7 @@ function App() {
             <span>{item.name}</span>
           </button>
         ))}
-      </nav>
+      </nav>}
       {toast && (
         <div className="toast" role="status">
           ✓ {toast}
@@ -841,7 +890,7 @@ function App() {
         <div className="modal-backdrop" onClick={() => setModal(null)}>
           <section
             ref={modalRef}
-            className={`modal ${modal.comparison ? 'comparison-modal' : ''}`}
+            className="modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
@@ -855,7 +904,14 @@ function App() {
             >
               <Icon name="close" />
             </button>
-            {modal.comparison ? <ProductComparison key={modal.comparison.id} product={modal.comparison} onAdd={addItem} /> : modal === 'location' ? (
+            {modal.switchShop ? <>
+              <span className="modal-symbol">🛍️</span>
+              <h2 id="modal-title">Start a new bag?</h2>
+              <p>Your bag contains items from <strong>{cart[0]?.sellerName}</strong>. To shop from <strong>{modal.switchShop.sellerName}</strong>, we’ll replace those items with {modal.switchShop.dish}.</p>
+              <p>One shop per order keeps your delivery simple.</p>
+              <button className="primary-button" onClick={() => { setCart([{ ...modal.switchShop, quantity: 1 }]); setModal(null); setToast('New shop, new bag. Your item has been added.') }}>Replace bag & add item</button>
+              <button className="account-link" onClick={() => setModal(null)}>Keep my current bag</button>
+            </> : modal === 'location' ? (
               <>
                 <span className="modal-symbol">📍</span>
                 <h2 id="modal-title">Where’s the good food going?</h2>
@@ -889,6 +945,7 @@ function App() {
                 <h2 id="modal-title">Your happy little bag</h2>
                 {cart.length ? (
                   <>
+                    <p className="shop-notice">Shopping from <strong>{cart[0].sellerName}</strong> · One shop, one delivery</p>
                     <div className="cart-list">
                       {cart.map((item) => (
                         <div className="cart-item" key={item.id}>
@@ -920,7 +977,7 @@ function App() {
                       <strong>Item total</strong>
                       <strong>₹{total}</strong>
                     </div>
-                    {deliveryTotal > 0 && <><div className="cart-total"><span>Delivery (once per seller)</span><b>₹{deliveryTotal}</b></div><div className="cart-total"><strong>Total including delivery</strong><strong>₹{total + deliveryTotal}</strong></div></>}
+                    {deliveryTotal > 0 && <><div className="cart-total"><span>Delivery</span><b>₹{deliveryTotal}</b></div><div className="cart-total"><strong>Total including delivery</strong><strong>₹{total + deliveryTotal}</strong></div></>}
                     <p className="demo-note">
                       This is a preview bag. Checkout and delivery aren’t
                       connected yet.
