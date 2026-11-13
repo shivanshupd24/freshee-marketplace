@@ -186,8 +186,8 @@ const essentials = [
   { id: 106, name: 'Home care', dish: 'Laundry detergent', emoji: '🧴', price: 119, unit: '500 g', group: 'Home care' },
 ]
 
-// Tile coordinates in the supplied 738 × 1600 category artwork.
-const categorySections = [
+// Retain category mappings used by existing home-page links.
+const legacyCategorySections = [
   { title: "Fashion & Accessories", items: [
     {"name": "Women’s Clothing", "emoji": "👗", "groups": ["Women’s Clothing"]},
     {"name": "Men’s Clothing", "emoji": "👕", "groups": ["Men’s Clothing"]},
@@ -247,7 +247,33 @@ const categorySections = [
     { name: 'Tea, Coffee & Milk Drinks', groups: ['Tea & Coffee'], x: 555, y: 1092 },
   ] },
 ]
-const browseCategories = categorySections.flatMap((section) => section.items)
+// Artwork crops from the supplied 718 × 1600 reference, excluding its labels.
+const categorySections = [
+  { title: 'Daily Essentials', items: [
+    { name: 'Kirana & Grocery', groups: ['Pantry', 'Spices', 'Cereals'], art: [28, 454, 150, 146] },
+    { name: 'Dairy & Milk', groups: ['Dairy'], art: [200, 454, 151, 146] },
+    { name: 'Fruits & Vegetables', groups: ['Fruits', 'Vegetables'], art: [375, 454, 150, 146] },
+    { name: 'Bakery & Cakes', groups: ['Bakery'], art: [545, 454, 147, 146] },
+  ] },
+  { title: 'Food & Treats', items: [
+    { name: 'Sweets & Namkeen', groups: ['Sweets', 'Snacks'], art: [28, 746, 204, 132] },
+    { name: 'Snacks & Drinks', groups: ['Snacks', 'Drinks', 'Tea & Coffee'], art: [256, 746, 209, 139] },
+    { name: 'Meat & Seafood', groups: ['Meat'], optional: true, art: [487, 777, 204, 108] },
+  ] },
+  { title: 'Lifestyle & Home', items: [
+    { name: 'Personal Care', groups: ['Skin Care', 'Makeup', 'Hair Care', 'Grooming'], art: [27, 1017, 147, 137] },
+    { name: 'Home & Kitchen', groups: ['Home care', 'Kitchenware', 'Furniture', 'Decor', 'Bedding'], art: [190, 1017, 161, 137] },
+    { name: 'Books & Stationery', groups: ['Books', 'School Supplies'], art: [373, 1017, 151, 128] },
+    { name: 'Pet Supplies', groups: ['Pet Supplies'], art: [544, 1017, 147, 137] },
+  ] },
+  { title: 'Gifts & Special Stores', items: [
+    { name: 'Customized Gifts', groups: ['Gifts'], art: [31, 1288, 155, 137] },
+    { name: 'Flowers & Bouquets', groups: ['Flowers'], art: [205, 1288, 150, 137] },
+    { name: 'Art & Craft', groups: ['Art & Craft'], art: [376, 1288, 149, 137] },
+    { name: 'Party & Decoration', groups: ['Party Supplies'], art: [545, 1288, 145, 130] },
+  ] },
+]
+const browseCategories = [...categorySections, ...legacyCategorySections].flatMap((section) => section.items)
 const matchesCategorySearch = (item, section, query) =>
   `${section.title} ${item.name} ${item.groups.join(' ')}`.toLowerCase().includes(query.trim().toLowerCase())
 
@@ -663,13 +689,13 @@ function App() {
           openCategory={openCategory}
         /> : isCategoryPage ? (
           <div className="category-directory" aria-label="Shop by category">
-            <div className="category-directory-heading"><h1>Explore all categories</h1><p>Everyday needs and your next favourite find.</p></div>
+            <div className="category-directory-heading"><h1>Explore local stores</h1><p>Everyday needs and your next favourite find.</p></div>
             {categorySections.map((section) => {
               const items = section.items.filter((item) => matchesCategorySearch(item, section, query))
               return items.length > 0 && (
                 <section className="category-group" key={section.title} aria-label={section.title}>
                   <h2>{section.title}</h2>
-                  <div className="category-tile-grid">
+                  <div className="category-tile-grid" style={{ '--category-columns': section.items.length }}>
                     {items.map((item) => (
                       <button className="category-tile" key={item.name} onClick={() => {
                         setCategory(item.name)
@@ -677,11 +703,12 @@ function App() {
                         setNav('Category results')
                         window.scrollTo({ top: 0, behavior: 'smooth' })
                       }}>
-                        {item.emoji ? (
-                          <span className="category-tile-art marketplace-category-art" aria-hidden="true"><span>{item.emoji}</span></span>
-                        ) : (
-                          <span className="category-tile-art" aria-hidden="true" style={{ backgroundPosition: `${item.x / 578 * 100}% ${item.y / 1432 * 100}%` }} />
-                        )}
+                        <span className="local-category-art" aria-hidden="true">
+                          <svg viewBox={item.art.join(' ')} focusable="false">
+                            <image href="/images/local-store-categories.jpeg" width="718" height="1600" />
+                          </svg>
+                          {item.optional && <span className="category-optional">Optional</span>}
+                        </span>
                         <span>{item.name}</span>
                       </button>
                     ))}
@@ -690,7 +717,7 @@ function App() {
               )
             })}
             {!categorySections.some((section) => section.items.some((item) => matchesCategorySearch(item, section, query))) && (
-              <div className="empty-state"><h2>No categories found</h2><p>Try searching for fashion, electronics, beauty or groceries.</p><button className="primary-button" onClick={() => setQuery('')}>Show all categories</button></div>
+              <div className="empty-state"><h2>No categories found</h2><p>Try searching for groceries, flowers, personal care or gifts.</p><button className="primary-button" onClick={() => setQuery('')}>Show all categories</button></div>
             )}
           </div>
         ) : isFood ? <>
