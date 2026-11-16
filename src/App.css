@@ -1385,8 +1385,8 @@ main {
 .bottom-nav > button.active .nav-icon:before, .freshee-pick { background: #f7e8f1; color: var(--magenta); }
 .search-box:focus-within { box-shadow: 0 0 0 3px var(--green); }
 .mood-list .selected img { outline-color: var(--magenta); }
-.essentials-mode { --service-bg: #edf7e3; --tab-muted: #897481; }
-.essentials-mode .festival-zone { background: #e1efcf; color: #35571f; }
+.essentials-mode { --service-bg: #fff8ee; --tab-muted: #806b60; --green: #b67a55; --magenta: #8b1936; }
+.essentials-mode .festival-zone { background: #f5e7d6; color: #652537; }
 .essentials-mode .delivery-label, .essentials-mode .address-detail { color: #796570; }
 .essentials-mode .service-tab.active { color: #701048; }
 .essentials-mode .tab-shape path { fill: #ece5e9; stroke: #d9cbd4; }
@@ -1397,7 +1397,7 @@ main {
 .essentials-categories button.active { background: var(--magenta); color: white; border-color: var(--magenta); }
 .essentials-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
 .essential-card { border: 1px solid #eee5eb; padding: 12px; border-radius: 17px; }
-.essential-art { position: relative; border-radius: 12px; background: #f3f7ec; display: grid; place-items: center; height: 140px; font-size: 65px; }
+.essential-art { position: relative; border-radius: 12px; background: #faf2e7; display: grid; place-items: center; height: 140px; font-size: 65px; }
 .essential-art .save-button { color: var(--magenta); background: white; filter: none; }
 .essential-card > p { color: #877480; font-size: 10px; margin: 12px 0 5px; }
 .essential-card h3 { font-size: 14px; }
@@ -1419,21 +1419,21 @@ main {
 .page-footer strong span { color: var(--green); }
 .save-button.saved svg { fill: var(--magenta); }
 
-.essentials-mode .category-tabs { border-color: #c8dcb8; }
-.essentials-mode .category-tabs > button { color: #657956; }
-.essentials-mode .category-tabs > button.active { color: #35571f; }
-.essentials-mode .category-tabs > button.active:after { background: #497d25; }
+.essentials-mode .category-tabs { border-color: #e8d3bd; }
+.essentials-mode .category-tabs > button { color: #806b60; }
+.essentials-mode .category-tabs > button.active { color: #652537; }
+.essentials-mode .category-tabs > button.active:after { background: #8b1936; }
 .essentials-mode .festival-heading p,
 .essentials-mode .festival-subtitle,
 .essentials-mode .festival-footnote,
-.essentials-mode .festival-footnote span { color: #52713c; }
-.essentials-mode .festival-heading h1 { color: #35571f; text-shadow: 2px 3px 0 #c8e5b1; }
+.essentials-mode .festival-footnote span { color: #80624f; }
+.essentials-mode .festival-heading h1 { color: #652537; text-shadow: 2px 3px 0 #ead0ad; }
 .essentials-mode .festival-heading h1 span { color: var(--magenta); }
 .essentials-mode .festival-heading h1 i,
-.essentials-mode .festival-food i { color: #79b34b; }
-.essentials-mode .offer-pink { background: linear-gradient(130deg, #658f41, #35571f); }
-.essentials-mode .offer-orange { background: linear-gradient(130deg, #c5ee9e, #92cf5b); }
-.essentials-mode .offer-purple { background: linear-gradient(130deg, #fff, #e0efce); color: #35571f; }
+.essentials-mode .festival-food i { color: #b67a55; }
+.essentials-mode .offer-pink { background: linear-gradient(130deg, #b54b60, #7d1732); }
+.essentials-mode .offer-orange { background: linear-gradient(130deg, #fff0d7, #e9c38d); color: #652537; }
+.essentials-mode .offer-purple { background: linear-gradient(130deg, #fff, #f5e7d6); color: #652537; }
 
 /* Scrollable department tiles below the Daily Essentials search. */
 .essentials-mode .department-tabs {
@@ -1453,8 +1453,8 @@ main {
   padding: 10px 8px;
   gap: 5px;
   border-radius: 14px 14px 0 0;
-  background: #dfedcf;
-  color: #435538;
+  background: #f5e7d6;
+  color: #755b4e;
   font-size: 11px;
   white-space: nowrap;
   scroll-snap-align: start;
@@ -1463,11 +1463,11 @@ main {
 .department-tabs > button svg { width: 20px; height: 20px; }
 .essentials-mode .department-tabs > button.active {
   background: #fff;
-  color: #294a19;
+  color: #652537;
   font-weight: 800;
 }
 .essentials-mode .department-tabs > button.active:after { display: none; }
-.essentials-mode .department-tabs > button:hover { background: #f6faef; }
+.essentials-mode .department-tabs > button:hover { background: #fffcf7; }
 @media (max-width: 700px) {
   .essentials-mode .department-tabs { margin-inline: 0; padding-inline: 20px; }
   .essentials-mode .department-tabs > button { flex: 0 0 70px; min-height: 60px; font-size: 10px; }
@@ -1502,7 +1502,7 @@ main {
 /* Dedicated category directory, with artwork from the supplied reference. */
 .category-view .festival-zone {
   border-radius: 0;
-  background: linear-gradient(180deg, #d9edbb, #f5f8ef);
+  background: linear-gradient(180deg, #f3dfc6, #fffbf5);
 }
 .category-view .service-panel { background: transparent; }
 .category-view .search-row { padding-bottom: 24px; }
@@ -1618,10 +1618,10 @@ main {
   transition: background .2s, border-color .2s, box-shadow .2s, transform .2s;
 }
 .app-shell .service-tab.active {
-  background: linear-gradient(120deg, #ecfbdc, #c8eda3);
-  border-color: #85bd54;
-  color: #294a19;
-  box-shadow: 0 3px 9px #35571f1a, inset 0 1px 0 #ffffffb3;
+  background: linear-gradient(120deg, #fff8ee, #eed2ad);
+  border-color: #b67a55;
+  color: #652537;
+  box-shadow: 0 3px 9px #7d17321a, inset 0 1px 0 #ffffffb3;
 }
 .food-mode .service-tab.active {
   background: linear-gradient(120deg, #fff1f9, #efc5df);
@@ -1686,7 +1686,7 @@ main {
 }
 .category-directory .category-tile {
   overflow: hidden;
-  background: #e8f8f1;
+  background: #fff8ee;
   padding: 8px 6px 14px;
   height: 100%;
 }
@@ -1708,5 +1708,22 @@ main {
   color: var(--magenta);
   font-size: clamp(9px, 2vw, 13px);
 }
-.category-directory .category-tile:hover { box-shadow: 0 4px 16px #28724b18; }
+.category-directory .category-tile:hover { box-shadow: 0 4px 16px #8b193618; }
 .category-directory .category-tile:focus-visible { outline: 3px solid var(--magenta); outline-offset: 3px; }
+
+/* Warm ivory and burgundy accents for Daily Essentials. */
+.essentials-mode .profile-button > span { background: #eed2ad; color: #652537; }
+.essentials-mode button:focus-visible,
+.essentials-mode a:focus-visible { outline-color: #8b1936; }
+.essentials-mode .tickets i { background: #fff0d7; border-color: #b67a55; color: #652537; }
+
+.essentials-mode .service-tab.active {
+  background: #8b1936;
+  border-color: #8b1936;
+  color: #fffaf3;
+  box-shadow: 0 3px 9px #65253720;
+}
+.essentials-mode .service-tab:not(.active) { background: #fffcf7; color: #755b4e; }
+.essentials-mode .search-box { background: #fffdf9; border-color: #e8d3bd; }
+.essentials-mode .bottom-nav > button.active { background: #f7e8df; }
+.essentials-mode .category-optional { background: #f7e8df; }

@@ -3,6 +3,7 @@ import './App.css'
 import MarketplaceHome from './MarketplaceHome'
 import ShopPages from './ShopPages'
 import SearchPage from './SearchPage'
+import CartPage from './CartPage'
 import { makeShops } from './shops'
 
 function Icon({ name, size = 22, ...props }) {
@@ -41,6 +42,7 @@ function Icon({ name, size = 22, ...props }) {
         <circle cx="8" cy="8" r="1" />
       </>
     ),
+    cart: <><path d="M2 3h3l3 12h11l3-9H6M8 15l-1 3h13" /><circle cx="9" cy="21" r="1" /><circle cx="19" cy="21" r="1" /></>,
     bag: (
       <>
         <path d="M5 7h14l2 14H3L5 7Z" />
@@ -267,6 +269,7 @@ const categorySections = [
     { name: 'Pet Supplies', groups: ['Pet Supplies'], art: [544, 1017, 147, 137] },
   ] },
   { title: 'Gifts & Special Stores', items: [
+    { name: 'Sacred Celebrations', groups: ['Flowers', 'Party Supplies', 'Decor', 'Puja'], art: [205, 1288, 150, 137] },
     { name: 'Customized Gifts', groups: ['Gifts'], art: [31, 1288, 155, 137] },
     { name: 'Flowers & Bouquets', groups: ['Flowers'], art: [205, 1288, 150, 137] },
     { name: 'Art & Craft', groups: ['Art & Craft'], art: [376, 1288, 149, 137] },
@@ -336,6 +339,7 @@ function App() {
     }
   }, [modal])
 
+  const isCartPage = nav === 'Cart'
   const isSearchPage = nav === 'Search' && !activeShop
   const isFood = mode === 'Food'
   const isMarketplaceHome = !activeShop && !isFood && nav === 'Home' && department === 'All' && category === 'All' && !query.trim()
@@ -379,7 +383,6 @@ function App() {
     .sort((a, b) => Number(b.rating) - Number(a.rating))
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
   const deliveryTotal = [...new Map(cart.filter((item) => item.sellerId).map((item) => [item.sellerId, item.deliveryFee])).values()].reduce((sum, fee) => sum + fee, 0)
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
   function openSearch() {
     setSearchQuery(query)
     setQuery('')
@@ -421,7 +424,7 @@ function App() {
           )
         : [...items, { ...item, quantity: 1 }],
     )
-    setToast(`${item.dish} added to your bag`)
+    setToast(`${item.dish} added to your cart`)
     setModal(null)
   }
   function changeQuantity(id, delta) {
@@ -432,10 +435,7 @@ function App() {
     )
   }
   function navigate(item) {
-    if (item === 'Bag') {
-      setModal('cart')
-      return
-    }
+    setModal(null)
     setActiveShop(null)
     setNav(item)
     setDepartment('All')
@@ -456,7 +456,7 @@ function App() {
 
   return (
     <div className={`app-shell ${isFood ? 'food-mode' : 'essentials-mode'} ${isCategoryView ? 'category-view' : ''}`}>
-      {!isSearchPage && !isShopPage && !isCategoryPage && <section className="festival-zone">
+      {!isCartPage && !isSearchPage && !isShopPage && !isCategoryPage && <section className="festival-zone">
         <div className="service-tabs" role="tablist" aria-label="Service">
           {['Daily Essentials', 'Food'].map((item) => (
             <button
@@ -669,13 +669,13 @@ function App() {
       </section>}
 
       <main>
-        {isSearchPage ? <SearchPage shops={shops} query={searchQuery} onSearch={setSearchQuery}
+        {isCartPage ? <CartPage cart={cart} onQuantity={changeQuantity} onBrowse={() => navigate('Home')} deliveryFee={deliveryTotal} /> : isSearchPage ? <SearchPage shops={shops} query={searchQuery} onSearch={setSearchQuery}
           onBack={() => navigate('Home')} onOpen={openShop} onAdd={addItem}
-          cart={cart} onQuantity={changeQuantity} onBag={() => setModal('cart')} /> : isShopPage ? <ShopPages
+          cart={cart} onQuantity={changeQuantity} onBag={() => navigate('Cart')} /> : isShopPage ? <ShopPages
           key={activeShop?.id || category}
           shops={shops.filter(s => s.groups.some(g => (selectedBrowseCategory?.groups || essentialDepartments.find(d => d.name === category)?.groups || [category]).includes(g)))}
           shop={activeShop} title={category} query={query} onSearch={setQuery} cart={cart}
-          onOpen={openShop} onAdd={addItem} onQuantity={changeQuantity} onBag={() => setModal('cart')}
+          onOpen={openShop} onAdd={addItem} onQuantity={changeQuantity} onBag={() => navigate('Cart')}
           onBack={() => { if (activeShop) { setActiveShop(null); setQuery('') } else navigate('Categories') }}
         /> : isMarketplaceHome ? <MarketplaceHome
           products={essentials}
@@ -685,8 +685,8 @@ function App() {
           saved={saved}
           address={address}
           toggleSaved={(id) => setSaved((ids) => ids.includes(id) ? ids.filter((value) => value !== id) : [...ids, id])}
-          viewAll={() => navigate('Categories')}
           openCategory={openCategory}
+          viewAll={() => navigate('Categories')}
         /> : isCategoryPage ? (
           <div className="category-directory" aria-label="Shop by category">
             <div className="category-directory-heading"><h1>Explore local stores</h1><p>Everyday needs and your next favourite find.</p></div>
@@ -877,7 +877,7 @@ function App() {
             {!visibleEssentials.length && <div className="empty-state"><h3>{nav === 'Saved' ? 'Your saved essentials belong here' : 'No products found'}</h3><p>{nav === 'Saved' ? 'Tap a heart to save an everyday favourite.' : selectedBrowseCategory ? 'No products are listed in this category yet. Explore another category.' : 'Try another search or category.'}</p></div>}
           </section>
         )}
-        {!isSearchPage && !isCategoryView && <footer className="page-footer">
+        {!isCartPage && !isSearchPage && !isCategoryView && <footer className="page-footer">
           <span>Made for your</span>
           <strong>
             {isFood ? 'happy cravings' : 'everyday discoveries'}<span>✳</span>
@@ -890,7 +890,7 @@ function App() {
         {[
           { name: 'Home', icon: 'home' },
           { name: 'Categories', icon: 'grid' },
-          { name: 'Bag', icon: 'bag' },
+          { name: 'Cart', icon: 'cart' },
         ].map((item) => (
           <button
             key={item.name}
@@ -900,7 +900,7 @@ function App() {
           >
             <span className="nav-icon">
               <Icon name={item.icon} size={20} />
-              {item.name === 'Bag' && cartCount > 0 && (
+              {item.name === 'Cart' && cartCount > 0 && (
                 <b className="cart-badge">{cartCount}</b>
               )}
             </span>
@@ -933,11 +933,11 @@ function App() {
             </button>
             {modal.switchShop ? <>
               <span className="modal-symbol">🛍️</span>
-              <h2 id="modal-title">Start a new bag?</h2>
-              <p>Your bag contains items from <strong>{cart[0]?.sellerName}</strong>. To shop from <strong>{modal.switchShop.sellerName}</strong>, we’ll replace those items with {modal.switchShop.dish}.</p>
+              <h2 id="modal-title">Start a new cart?</h2>
+              <p>Your cart contains items from <strong>{cart[0]?.sellerName}</strong>. To shop from <strong>{modal.switchShop.sellerName}</strong>, we’ll replace those items with {modal.switchShop.dish}.</p>
               <p>One shop per order keeps your delivery simple.</p>
-              <button className="primary-button" onClick={() => { setCart([{ ...modal.switchShop, quantity: 1 }]); setModal(null); setToast('New shop, new bag. Your item has been added.') }}>Replace bag & add item</button>
-              <button className="account-link" onClick={() => setModal(null)}>Keep my current bag</button>
+              <button className="primary-button" onClick={() => { setCart([{ ...modal.switchShop, quantity: 1 }]); setModal(null); setToast('New shop, new cart. Your item has been added.') }}>Replace cart & add item</button>
+              <button className="account-link" onClick={() => setModal(null)}>Keep my current cart</button>
             </> : modal === 'location' ? (
               <>
                 <span className="modal-symbol">📍</span>
@@ -966,57 +966,6 @@ function App() {
                   <button className="primary-button">Save address</button>
                 </form>
               </>
-            ) : modal === 'cart' ? (
-              <>
-                <span className="modal-symbol">🛍️</span>
-                <h2 id="modal-title">Your happy little bag</h2>
-                {cart.length ? (
-                  <>
-                    <p className="shop-notice">Shopping from <strong>{cart[0].sellerName}</strong> · One shop, one delivery</p>
-                    <div className="cart-list">
-                      {cart.map((item) => (
-                        <div className="cart-item" key={item.id}>
-                          <span className="cart-item-art">{item.emoji || <img src={`/images/${item.image}.jpg`} alt="" />}</span>
-                          <div>
-                            <strong>{item.dish}</strong>
-                            <small>₹{item.price} each{item.sellerName ? ` · ${item.sellerName}` : ''}</small>
-                            <div className="quantity">
-                              <button
-                                aria-label={`Remove one ${item.dish}`}
-                                onClick={() => changeQuantity(item.id, -1)}
-                              >
-                                −
-                              </button>
-                              <span>{item.quantity}</span>
-                              <button
-                                aria-label={`Add one ${item.dish}`}
-                                onClick={() => changeQuantity(item.id, 1)}
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                          <b>₹{item.quantity * item.price}</b>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="cart-total">
-                      <strong>Item total</strong>
-                      <strong>₹{total}</strong>
-                    </div>
-                    {deliveryTotal > 0 && <><div className="cart-total"><span>Delivery</span><b>₹{deliveryTotal}</b></div><div className="cart-total"><strong>Total including delivery</strong><strong>₹{total + deliveryTotal}</strong></div></>}
-                    <p className="demo-note">
-                      This is a preview bag. Checkout and delivery aren’t
-                      connected yet.
-                    </p>
-                  </>
-                ) : (
-                  <p>
-                    Your next favourite meal is waiting. Explore the menu and
-                    add a little happiness.
-                  </p>
-                )}
-              </>
             ) : modal === 'account' ? (
               <>
                 <span className="modal-symbol">✳</span>
@@ -1034,10 +983,10 @@ function App() {
                 </button>
                 <button
                   className="account-link"
-                  onClick={() => setModal('cart')}
+                  onClick={() => navigate('Cart')}
                 >
-                  <Icon name="bag" />
-                  Your bag <span>{cartCount}</span>
+                  <Icon name="cart" />
+                  Your cart <span>{cartCount}</span>
                 </button>
                 <p className="demo-note">
                   You’re exploring the Freshee demo. No sign-in required.
@@ -1102,7 +1051,7 @@ function App() {
                   className="primary-button"
                   onClick={() => addItem(modal)}
                 >
-                  Add to bag <span>₹{modal.price}</span>
+                  Add to cart <span>₹{modal.price}</span>
                 </button>
               </>
             )}

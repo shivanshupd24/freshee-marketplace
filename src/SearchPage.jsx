@@ -30,6 +30,6 @@ export default function SearchPage({ shops, query, onSearch, onBack, onOpen, onA
       </section>)}
       {!!results.length && <p className="search-price-note">Prices include one delivery fee. Delivery is charged once per order.</p>}
     </>}
-    {!!cart.length && <button className="shop-bag search-bag" onClick={onBag}><span><strong>{cart.reduce((sum,p) => sum+p.quantity,0)} items · ₹{cart.reduce((sum,p) => sum+p.price*p.quantity,0)}</strong><small>{cart[0].sellerName}</small></span><b>View bag →</b></button>}
+    {!!cart.length && <button className="shop-bag search-bag" onClick={onBag}><span><strong>{cart.reduce((sum,p) => sum+p.quantity,0)} items · ₹{cart.reduce((sum,p) => sum+p.price*p.quantity,0)}</strong><small>{cart[0].sellerName}</small></span><b>View cart →</b></button>}
   </section>
 }

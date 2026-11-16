@@ -1,0 +1,26 @@
+.cart-page { padding-bottom: 24px; color: #382b25; }
+.cart-page-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.cart-page-heading h1 { font-size: 26px; letter-spacing: -.6px; }
+.cart-page-heading p, .cart-page-caption { color: #85766b; font-size: 12px; margin-top: 4px; }
+.cart-page-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(240px, 1fr); gap: 22px; align-items: start; }
+.cart-page-items, .cart-page-summary { padding: 20px; border: 1px solid #eee4d9; border-radius: 18px; background: #fff; }
+.cart-page h2 { font-size: 18px; }
+.cart-page-item { display: flex; align-items: center; gap: 12px; padding: 18px 0; border-bottom: 1px solid #f0e9e1; }
+.cart-page-art { flex: 0 0 72px; width: 72px; height: 72px; overflow: hidden; border-radius: 12px; }
+.cart-page-art svg, .cart-page-art img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.cart-page-item-copy { flex: 1; min-width: 0; }
+.cart-page-item h3 { font-size: 13px; line-height: 1.4; }
+.cart-page-item p { font-size: 10px; color: #85766b; margin: 4px 0 8px; }
+.cart-page-item > strong { font-size: 13px; }
+.cart-page-item .shop-stepper { display: inline-flex; }
+.cart-continue { color: #8b1936; font-size: 12px; font-weight: 700; padding: 18px 0 0; }
+.cart-page-summary { background: #fff8ee; }
+.cart-page-summary dl { margin: 20px 0 0; font-size: 13px; }
+.cart-page-summary dl > div { display: flex; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.cart-page-summary dd { margin: 0; font-weight: 650; }
+.cart-pay-total { padding-top: 16px; border-top: 1px solid #e8d7c5; font-weight: 800; }
+.cart-preview-note { font-size: 11px; line-height: 1.6; color: #806b60; margin-top: 22px; }
+.cart-page-empty { text-align: center; padding: 60px 16px; }
+.cart-page-empty > svg { color: #8b1936; margin-bottom: 20px; }
+.cart-page-empty p { margin: 12px 0 24px; color: #85766b; font-size: 13px; }
+@media(max-width: 700px) { .cart-page-layout { grid-template-columns: 1fr; gap: 16px; } .cart-page-items, .cart-page-summary { padding: 16px; } .cart-page-art { flex-basis: 58px; width: 58px; height: 58px; } .cart-page-item { gap: 9px; } }
